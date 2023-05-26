@@ -1,24 +1,122 @@
-<script setup>
-import {ref} from "vue"
-import "leaflet/dist/leaflet.css";
-// import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
-import { LMap, LTileLayer } from "vue3-leaflet";
+<template>
+  <div id="map" class="w-full h-[700px]"></div>
+</template>
 
+<script>
+import { ref, onMounted } from "vue";
+import L from "leaflet";
+import "@geoapify/leaflet-address-search-plugin";
+import "leaflet/dist/leaflet.css";
+import "leaflet-control-geocoder/dist/Control.Geocoder.css";
+import "leaflet-control-geocoder/dist/Control.Geocoder.js";
+
+export default {
+  name: "MapView",
+  setup() {
+    const map = ref(null);
+    let marker = null;
+
+    onMounted(initializeMap);
+
+    function initializeMap() {
+      // Create a map instance
+      map.value = L.map("map").setView([0, 0], 13);
+
+      // Add the Google Maps style tile layer
+      L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+        maxZoom: 18,
+      }).addTo(map.value);
+
+      // Get the user's current location
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          // Set the map view to the user's location
+          map.value.setView([latitude, longitude], 13);
+
+          // Add a marker at the user's location
+          if (marker !== null) {
+            map.value.removeLayer(marker);
+          }
+          marker = L.marker([latitude, longitude]).addTo(map.value);
+
+          marker.on('click', () => {
+         map.value.setView([latitude, longitude], 13);
+      });
+        },
+        (error) => {
+          console.error("Error getting current location:", error);
+        }
+      );
+
+      const searchControl = L.control.addressSearch(
+        // process.env.VUE_APP_GEOAPIFY_API_KEY,
+        "47777fe9156749ca89df5e1b9ef27751",
+        {
+          autocomplete: true,
+          position: "topright",
+          placeholder: "Enter address here",
+          showMarker: true,
+          resultCallback: (address) => {
+            if (!address) {
+              return;
+            }
+            if (marker !== null) {
+              map.value.removeLayer(marker);
+            }
+            marker = L.marker([address.lat, address.lon]).addTo(map.value);
+            marker.on('click', () => {
+            map.value.setView([address.lat, address.lon], 13);})
+            map.value.setView([address.lat, address.lon], 13);
+          },
+        }
+      );
+
+      searchControl.addTo(map.value);
+
+      // Update marker position on map zoom
+      map.value.on("zoomend", () => {
+        if (marker !== null) {
+          const { lat, lng } = marker.getLatLng();
+          marker.setLatLng([lat, lng]).update();
+        }
+      });
+    }
+
+    return {
+      map,
+    };
+  },
+};
 </script>
 
-<template>
-    <!-- <div class = " w-2/3 h-10">
-        <l-map :center="mapCenter" :zoom="zoom" style="height: 100vh">
-            <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"></l-tile-layer>
-        </l-map>
-    </div> -->
-    <div style="height:600px; width:800px">
-    <l-map ref="map" v-model:zoom= "zoom" :center="[47.41322, -1.219482]">
-      <l-tile-layer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        layer-type="base"
-        name="OpenStreetMap"
-      ></l-tile-layer>
-    </l-map>
-  </div>
-</template>
+<!-- <style scoped>
+      /* Custom styles for the search control */
+      .leaflet-control-address-search .address-search-input {
+        width: 200px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 6px;
+        font-size: 14px;
+      }
+
+      .leaflet-control-address-search .address-search-results {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-top: none;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .leaflet-control-address-search .address-search-results-item {
+        padding: 4px 8px;
+        cursor: pointer;
+      }
+
+      .leaflet-control-address-search .address-search-results-item:hover {
+        background-color: #f0f0f0;
+      }
+    </style> -->

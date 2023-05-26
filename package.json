@@ -10,6 +10,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@geoapify/leaflet-address-search-plugin": "^1.0.2",
+    "leaflet-control-geocoder": "^2.4.0",
+    "mapbox-gl": "^2.15.0",
     "vue": "^3.2.36",
     "vue3-leaflet": "^1.0.46"
   },
