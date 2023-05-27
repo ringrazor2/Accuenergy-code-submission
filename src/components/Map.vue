@@ -1,14 +1,9 @@
-<template>
-  <div id="map" class="w-full h-[700px]"></div>
-</template>
 
 <script>
 import { ref, onMounted } from "vue";
 import L from "leaflet";
 import "@geoapify/leaflet-address-search-plugin";
 import "leaflet/dist/leaflet.css";
-import "leaflet-control-geocoder/dist/Control.Geocoder.css";
-import "leaflet-control-geocoder/dist/Control.Geocoder.js";
 
 export default {
   name: "MapView",
@@ -24,7 +19,7 @@ export default {
 
       // Add the Google Maps style tile layer
       L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
-        maxZoom: 18,
+        maxZoom: 13,
       }).addTo(map.value);
 
       // Get the user's current location
@@ -54,11 +49,10 @@ export default {
         // process.env.VUE_APP_GEOAPIFY_API_KEY,
         "47777fe9156749ca89df5e1b9ef27751",
         {
-          autocomplete: true,
           position: "topright",
           placeholder: "Enter address here",
-          showMarker: true,
           resultCallback: (address) => {
+           console.log(address);
             if (!address) {
               return;
             }
@@ -91,13 +85,17 @@ export default {
 };
 </script>
 
+<template>
+  <div id="map" class="w-[65%] h-screen"></div>
+</template>
+
 <!-- <style scoped>
-      /* Custom styles for the search control */
-      .leaflet-control-address-search .address-search-input {
-        width: 200px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        padding: 6px;
+  /* Custom styles for the search control */
+  .leaflet-control-address-search .address-search-input {
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px;
         font-size: 14px;
       }
 
