@@ -2,10 +2,10 @@
 
 This is a coding task for Accuenergy done by Richard Chiu
 
-## Project Setup
+## Dev Notes
 
 ```sh
-npm install
+Application is not meant to be responsive - runs ideally 800px wide and above
 ```
 
 ### Compile and Hot-Reload for Development

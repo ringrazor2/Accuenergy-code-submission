@@ -1,9 +1,11 @@
-
 <script>
 import { ref, onMounted } from "vue";
+import { db } from "../../firebase";
 import L from "leaflet";
 import "@geoapify/leaflet-address-search-plugin";
 import "leaflet/dist/leaflet.css";
+import {arrayUnion, doc, updateDoc} from "firebase/firestore";
+
 
 export default {
   name: "MapView",
@@ -19,7 +21,7 @@ export default {
 
       // Add the Google Maps style tile layer
       L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
-        maxZoom: 13,
+        maxZoom: 15,
       }).addTo(map.value);
 
       // Get the user's current location
@@ -45,6 +47,19 @@ export default {
         }
       );
 
+      const path = doc(db, "users", "searches") 
+      const searchedAddress = async(address) => {
+        await updateDoc(path, {
+          search: arrayUnion({
+            id: address.place_id,
+            address: address.formatted,
+            lat: address.lat,
+            lon: address.lon,
+            time: new Date().toLocaleString()
+          }),
+ 
+        })
+      }
       const searchControl = L.control.addressSearch(
         // process.env.VUE_APP_GEOAPIFY_API_KEY,
         "47777fe9156749ca89df5e1b9ef27751",
@@ -56,13 +71,15 @@ export default {
             if (!address) {
               return;
             }
-            if (marker !== null) {
-              map.value.removeLayer(marker);
-            }
+            // if (marker !== null) {
+            //   map.value.removeLayer(marker);
+            // }
             marker = L.marker([address.lat, address.lon]).addTo(map.value);
             marker.on('click', () => {
-            map.value.setView([address.lat, address.lon], 13);})
+            map.value.setView([address.lat, address.lon], 13)})
             map.value.setView([address.lat, address.lon], 13);
+
+             searchedAddress(address)
           },
         }
       );
@@ -89,32 +106,3 @@ export default {
   <div id="map" class="w-[65%] h-screen"></div>
 </template>
 
-<!-- <style scoped>
-  /* Custom styles for the search control */
-  .leaflet-control-address-search .address-search-input {
-    width: 200px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 6px;
-        font-size: 14px;
-      }
-
-      .leaflet-control-address-search .address-search-results {
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-top: none;
-        border-bottom-left-radius: 4px;
-        border-bottom-right-radius: 4px;
-        max-height: 200px;
-        overflow-y: auto;
-      }
-
-      .leaflet-control-address-search .address-search-results-item {
-        padding: 4px 8px;
-        cursor: pointer;
-      }
-
-      .leaflet-control-address-search .address-search-results-item:hover {
-        background-color: #f0f0f0;
-      }
-    </style> -->
