@@ -94,38 +94,48 @@ const fetchFirstPage = async () => {
 };
 
 const fetchNextPage = async () => {
-  console.log(lastEntry);
-  if (pageCount.value === 2) {
-    
-    return;
-  }
-  page.value++;
-  pageCount.value++;
-  moreData.value = true
+  // console.log(lastEntry);
+  // if (pageCount.value === 2) {
+  //   moreData.value = false
+  //   return;
+  // }
+  // page.value++;
+  // pageCount.value++;
+  // moreData.value = true
   const q = query(
     collection(db, "testingSelect"),
     orderBy("time", "asc"),
     startAfter(lastEntry.time),
     limit(pageSize)
-  );
-
-  console.log(q);
+    );
+    let data = []
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      data = snapshot.docs.map((doc) => doc.data());
+      console.log(data);
+      userSearch10.value = data;
+      const lastDocument = snapshot.docs[snapshot.docs.length - 1];
+     console.log(userSearch10.value.length);
+      if(userSearch10.value.length !== 10){
+    changePage()
+       return;
+      }
+      lastEntry = lastDocument ? lastDocument.data() : null;
+      hasNextPage.value = snapshot.docs.length === pageSize;
+      // if(snapshot.docs.length < pageSize) {
+        //  lastEntry
+        // }
+      });
+   console.log(userSearch10.value.length);  
   
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const data = snapshot.docs.map((doc) => doc.data());
-    userSearch10.value = data;
-    const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-    lastEntry = lastDocument ? lastDocument.data() : null;
-    hasNextPage.value = snapshot.docs.length === pageSize;
-    // if(snapshot.docs.length < pageSize) {
-    //  lastEntry
-    // }
-  });
-
-  return unsubscribe;
+      return unsubscribe;
 };
+const changePage = () =>{
+  page.value++;
+  pageCount.value++;
+  moreData.value = true
+}
 const fetchPreviousPage = async () => {
-  if (pageCount.value === 1) {
+  if (lastEntry === null) {
     return;
   }
   page.value--;
