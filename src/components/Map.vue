@@ -34,7 +34,7 @@ const props = defineProps({
     
     // fix production error of leaflet marker
     L.Marker.prototype.options.icon = L.icon({
-    iconUrl: "../../public/marker-icon.png",
+    iconUrl: "https://www.pngall.com/wp-content/uploads/10/Map-Marker-PNG-Images-HD.png",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
