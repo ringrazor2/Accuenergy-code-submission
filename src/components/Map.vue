@@ -19,9 +19,7 @@ const props = defineProps({
     },})
 
     const loc = ref(props.location)
-    
-    
-    
+   
     function initializeMap() {
       // Create a map instance
       map.value = L.map("map").setView([0, 0], 13);      
