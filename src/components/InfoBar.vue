@@ -16,6 +16,8 @@ import {
 } from "firebase/firestore";
 import Head from "./Head.vue";
 import "leaflet-control-geocoder";
+import VPagination from "@hennge/vue3-pagination";
+import "@hennge/vue3-pagination/dist/vue3-pagination.css";
 
 const latitude = ref("");
 const longitude = ref("");
@@ -192,25 +194,25 @@ onMounted(fetchFirstPage);
   <div class="flex flex-col bg-dark h-screen w-[35%] px-5 items-center">
     <Head />
     <button class="btn" @click="locationClick">
-      Your Location
+      <p class = "text-2xl">Your Location</p>
     </button>
     <div>
-      <p class="text-white pt-5 text-center" v-if="placeName">
+      <p class="text-white pt-8 text-center text-xl" v-if="placeName">
         You are here: {{ placeName }} [lat: {{ latitude.toFixed(2) }}, lng: {{ longitude.toFixed(2) }}]
       </p>
     </div>
-    <div class="flex flex-col mt-6">
-      <h2 class="text-primary text-3xl capitalize text-center pb-4">History</h2>
-      <button class="bg-red-600 hover:bg-red-700 text-white w-1/4 rounded-md items-end mb-0.5" v-if="userSearch10?.length > 0" @click="deleteSelectedPlaces">
+    <div class="flex flex-col mt-10">
+      <h2 class="text-primary text-4xl capitalize text-center pb-4">History</h2>
+      <button class="bg-red-600 hover:bg-red-700 text-white w-1/4 rounded-md items-end mb-0.5 text-xl" v-if="userSearch10?.length > 0" @click="deleteSelectedPlaces">
         Delete
       </button>
-      <div class="max-h-96 overflow-y-auto">
-  <table class="bg-white w-full rounded-lg text-xs" v-if="userSearch10?.length > 0">
+      <div class="max-h-[700px] overflow-y-auto">
+  <table class="bg-white w-full rounded-lg text-lg" v-if="userSearch10?.length > 0">
     <thead>
-      <tr class="p-4">
-        <th class="px-4">Select</th>
-        <th class = "pt-2">Time searched</th>
-        <th>Address</th>
+      <tr class="p-4 pt-4">
+        <th class="px-4 pt-4">Select</th>
+        <th class = "pt-4">Time searched</th>
+        <th class = "pt-4">Address</th>
       </tr>
     </thead>
     <tbody>
@@ -232,21 +234,35 @@ onMounted(fetchFirstPage);
   </div>
 </div>
 <div v-if="userSearch10?.length > 0" class = "flex items-center justify-center p-2">
-  <!-- <v-pagination
-  v-model="page"
-  :pages="pageCount"
-  :range-size="1"
-  active-color="#DCEDFF"
-  :disabled="true"
-  @update:modelValue="displayPage"
-/> -->
   </div>
 
+  <div class = "flex items-center justify-center p-2">
+    <v-pagination
+    v-model="page"
+    :pages="pageCount"
+    :range-size="1"
+    active-color="#DCEDFF"
+  />
+
+  </div>
 <div class = "flex justify-between w-full text-white">
-<button @click = "fetchPreviousPage" v-if="userSearch10?.length > 0" >Previous</button>
-<button @click = "fetchNextPage" v-if="userSearch10?.length" >Next</button>
+<button class = "text-2xl" @click = "fetchPreviousPage" v-if="userSearch10?.length > 0" >Previous</button>
+<button class = "text-2xl" @click = "fetchNextPage" v-if="userSearch10?.length" >Next</button>
 </div>
   
   </div>
 </template>
+
+<style>
+.Page{
+  width: 30px;
+  height: 30px;
+  cursor: auto;
+  border: none;
+}
+.Page:hover{
+  border: none;
+}
+
+</style>
 

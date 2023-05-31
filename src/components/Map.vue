@@ -137,3 +137,14 @@ const props = defineProps({
   <div id="map" class="w-[65%] h-screen"></div>
 </template>
 
+<style>
+form{
+  width: 500px;
+}
+
+input{
+  width: 100%;
+  padding: 0.45rem;
+}
+</style>
+

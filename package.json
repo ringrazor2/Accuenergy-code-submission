@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@geoapify/leaflet-address-search-plugin": "^1.0.2",
+    "@hennge/vue3-pagination": "^1.0.17",
     "@vue/cli": "^5.0.8",
     "firebase": "^9.22.1",
     "leaflet-control-geocoder": "^2.4.0",
