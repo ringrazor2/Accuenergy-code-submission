@@ -3,8 +3,10 @@
 This is a coding task for Accuenergy done by Richard Chiu.
 The application utilizes map and geolocation API to display interactive mapping for users.
 
+For ease of demoing, app is deployed at:
+
 ```sh
-For ease of demoing, app is deployed at: https://richard-chiu-accuenergy-task.netlify.app/
+ https://richard-chiu-accuenergy-task.netlify.app/
 
 ```
 
