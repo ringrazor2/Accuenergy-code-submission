@@ -222,7 +222,7 @@ onMounted(fetchFirstPage);
               :class="{ 'bg-gray-300': selectedRow === index }"
               class="hover:bg-slate-300"
             >
-              <td class="my-3 pl-5"><input type="checkbox" class="cursor-pointer" v-model="data.selected" /></td>
+              <td class="my-3"><input type="checkbox" class="cursor-pointer h-4" v-model="data.selected" /></td>
               <td class="py-3">{{ data.time }}</td>
               <td
                 class="py-3 overflow-hidden pl-6 cursor-pointer"
@@ -236,7 +236,7 @@ onMounted(fetchFirstPage);
 <div v-if="userSearch10?.length > 0" class = "flex items-center justify-center p-2">
   </div>
 
-  <div class = "flex items-center justify-center p-2">
+  <div v-if="userSearch10?.length > 0" class = "flex items-center justify-center p-2">
     <v-pagination
     v-model="page"
     :pages="pageCount"
