@@ -1,28 +1,32 @@
 # accuenergy-task
 
-This is a coding task for Accuenergy done by Richard Chiu
-
-## Dev Notes
+This is a coding task for Accuenergy done by Richard Chiu.
+The application utilizes map and geolocation API to display interactive mapping for users.
 
 ```sh
-Application is not meant to be responsive - runs ideally 800px wide and above
+For ease of demoing, app is deployed at: https://richard-chiu-accuenergy-task.netlify.app/
 
 ```
 
-### Compile and Hot-Reload for Development
+## Features
 
-```sh
-npm run dev
-```
+- Interactive map display
+- User's current location detection
+- Geolocation services
+
+![App Screenshot](./public/app_screenshot.PNG)
+
+### Getting Started
+
+clone repository and install all dependencies
+configure API keys and variables (.env.local)
+
+keys needed:
+
+- firebase firestore (https://firebase.google.com/)
+- geoapify (https://www.geoapify.com/)
+- googlemaps (https://developers.google.com/maps/documentation/javascript/get-api-key)
 
 ### Compile and Minify for Production
 
-```sh
 npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
