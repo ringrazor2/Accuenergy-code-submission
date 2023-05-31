@@ -16,8 +16,6 @@ import {
 } from "firebase/firestore";
 import Head from "./Head.vue";
 import "leaflet-control-geocoder";
-import VPagination from "@hennge/vue3-pagination";
-import "@hennge/vue3-pagination/dist/vue3-pagination.css";
 
 const latitude = ref("");
 const longitude = ref("");
