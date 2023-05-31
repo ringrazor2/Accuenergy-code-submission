@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, inject } from "vue";
-import {auth, db} from "../../firebase"
+import {db} from "../../firebase"
 import {
   doc,
   onSnapshot,
@@ -12,6 +12,7 @@ import {
   orderBy,
   deleteDoc,
   updateDoc,
+  limitToLast,
 } from "firebase/firestore";
 import Head from "./Head.vue";
 import "leaflet-control-geocoder";
@@ -22,13 +23,14 @@ const latitude = ref("");
 const longitude = ref("");
 const placeName = ref("");
 const userSearch10 = ref([]);
+const previousEntryNext = ref(null)
+const previousEntryPrev = ref(null)
 const selectedRow = ref(null)
-const moreData = ref(true)
-let page = ref(1);
-let pageCount = ref(1);
-const hasNextPage = ref(true);
+const page = ref(1);
+const pageCount = ref(1);
 const pageSize = 10;
-let lastEntry = null;
+let maxPageCount = 0
+let allDocuments = []
 
 const receiveData = inject("receiveData");
 
@@ -38,7 +40,9 @@ const locationClick = async () => {
     longitude.value = position.coords.longitude;
 
     // Perform reverse geocoding using Google Maps Geocoding API
-    const apiKey = "AIzaSyArDcrpqRH6QHCHpPefS8Q36ftHghcs9Xg";
+    
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+    // const apiKey = "AIzaSyArDcrpqRH6QHCHpPefS8Q36ftHghcs9Xg";
     const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude.value},${longitude.value}&key=${apiKey}`;
 
     try {
@@ -64,7 +68,7 @@ const deleteSelectedPlaces = async () => {
   // for each selected data delete from database and update the userSearch10 array
   for (const document of selectedDocuments) {
     try {
-      const documentRef = doc(db, "testingSelect", document.id);
+      const documentRef = doc(db, "search", document.id);
       await updateDoc(documentRef, { selected: true });
       await deleteDoc(documentRef);
     } catch (error) {
@@ -80,72 +84,107 @@ const goToAddress = (lat, lon) => {
 // Query data for pagination
 const fetchFirstPage = async () => {
   const q = query(
-    collection(db, "testingSelect"),
+    collection(db, "search"),
     orderBy("time", "asc"),
     limit(pageSize)
   );
+
+  // get real time data from database
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const data = snapshot.docs.map((doc) => doc.data());
+    
+    //save batches of 10 data to state
     userSearch10.value = data;
+    
+    // store all data in an array 
+    allDocuments.push(...data);
+
+    // get first and last document from the batch
     const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-    lastEntry = lastDocument ? lastDocument.data() : null;
+    const firstDocument = snapshot.docs[0];
+
+    previousEntryNext.value = lastDocument ? lastDocument.data() : null;
+    previousEntryPrev.value = firstDocument ? firstDocument.data() : null;
+    
+    
   });
+  // return if we don't need real time data anymore
   return unsubscribe;
 };
+
 
 const fetchNextPage = async () => {
-  console.log(lastEntry);
-  if (pageCount.value === 2) {
-    
+  if (previousEntryNext.value === null) {
     return;
   }
-  page.value++;
-  pageCount.value++;
-  moreData.value = true
+  
   const q = query(
-    collection(db, "testingSelect"),
+    collection(db, "search"),
     orderBy("time", "asc"),
-    startAfter(lastEntry.time),
+    startAfter(previousEntryNext.value.time),
     limit(pageSize)
   );
-
-  console.log(q);
-  
+    
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const data = snapshot.docs.map((doc) => doc.data());
-    userSearch10.value = data;
     const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-    lastEntry = lastDocument ? lastDocument.data() : null;
-    hasNextPage.value = snapshot.docs.length === pageSize;
-    // if(snapshot.docs.length < pageSize) {
-    //  lastEntry
-    // }
+    const firstDocument = snapshot.docs[0];
+    
+    allDocuments.push(...data);
+    const uniqueDoc = [...new Set(allDocuments)];
+   
+    // get max page count for conditional 
+    maxPageCount = Math.ceil(uniqueDoc.length / pageSize);
+    if (pageCount.value >= maxPageCount) {
+      return;
+    }
+    
+    userSearch10.value = data;
+    previousEntryNext.value = lastDocument ? lastDocument.data() : null;
+
+    previousEntryPrev.value = firstDocument ? firstDocument.data() : null;
+    
+    
+    page.value++;
+    pageCount.value++;
+    
   });
 
   return unsubscribe;
 };
+
 const fetchPreviousPage = async () => {
-  if (pageCount.value === 1) {
+  if (previousEntryPrev.value === null) {
+    return;
+  }
+  if (pageCount.value <= 1) {
     return;
   }
   page.value--;
   pageCount.value--;
 
   const q = query(
-    collection(db, "testingSelect"),
+    collection(db, "search"),
     orderBy("time", "asc"),
-    endBefore(lastEntry.time),
-    limit(pageSize)
+    endBefore(previousEntryPrev.value.time),
+    limitToLast(pageSize)
   );
   const unsubscribe = onSnapshot(q, (snapshot) => {
     const data = snapshot.docs.map((doc) => doc.data());
     userSearch10.value = data;
+    
     const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-    lastEntry = lastDocument ? lastDocument.data() : null;
+    const firstDocument = snapshot.docs[0];
+    
+    previousEntryNext.value = lastDocument ? lastDocument.data() : null;
+
+    previousEntryPrev.value = firstDocument ? firstDocument.data() : null;
+    
   });
 
   return unsubscribe;
 };
+
 
 onMounted(fetchFirstPage);
 
@@ -195,26 +234,21 @@ onMounted(fetchFirstPage);
   </div>
 </div>
 <div v-if="userSearch10?.length > 0" class = "flex items-center justify-center p-2">
-  <v-pagination
+  <!-- <v-pagination
   v-model="page"
   :pages="pageCount"
   :range-size="1"
   active-color="#DCEDFF"
-  @update:modelValue="(value) => {
-    if (value > page) {
-      fetchNextPage();
-    } else if (value < page) {
-      fetchPreviousPage();
-    }
-  }"
-/>
+  :disabled="true"
+  @update:modelValue="displayPage"
+/> -->
   </div>
 
 <div class = "flex justify-between w-full text-white">
 <button @click = "fetchPreviousPage" v-if="userSearch10?.length > 0" >Previous</button>
-<button @click = "fetchNextPage" v-if="userSearch10?.length" :disabled="!moreData">Next</button>
-
+<button @click = "fetchNextPage" v-if="userSearch10?.length" >Next</button>
 </div>
-    
+  
   </div>
 </template>
+

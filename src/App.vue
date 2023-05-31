@@ -3,6 +3,7 @@ import {provide, ref} from "vue";
 import InfoBar from "./components/InfoBar.vue"
 import Map from "./components/Map.vue"
 
+// passing prop to Map component
 let location = ref(null);
 
 const receiveData = (lat, lon) => {
@@ -20,30 +21,4 @@ provide("receiveData", receiveData);
 </div>
   
 </template>
-<!-- <script setup>
-import {provide, ref, onMounted} from "vue";
-import {getAuth, onAuthStateChanged, signOut, handleSignOut} from "firebase/auth";
-import InfoBar from "./components/InfoBar.vue"
-import Map from "./components/Map.vue"
-
-
-let isLoggedIn = ref(false);
-
-let auth;
-onMounted(() => {
-const auth = getAuth();
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-  isLoggedIn.value = true
-  } else {
-  isLoggedIn.value = false
-  }
-});
-})
-
-</script>
-
-<template >
-  <router-view/>  
-</template> -->
 

@@ -1,30 +1,30 @@
 <script setup>
-import { ref, onMounted, onUnmounted, inject, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { db } from "../../firebase";
 import L from "leaflet";
 import "@geoapify/leaflet-address-search-plugin";
 import "leaflet/dist/leaflet.css";
 import {doc, collection, setDoc, onSnapshot} from "firebase/firestore";
 
-    const map = ref(null);
-    let marker = null;
+const map = ref(null);
+let marker = null;
 
-  const props = defineProps({
-    location: {
+// receive prop from parent 
+const props = defineProps({
+  location: {
       type: Object,
       default: null,
     },})
 
     const loc = ref(props.location)
     
-
-
     onMounted(initializeMap);
    
     function initializeMap() {
       // Create a map instance
       map.value = L.map("map").setView([0, 0], 13);      
       
+      // watch for changes in location prop
       watch(() => props.location, (val) => {
       loc.value = val;
       map.value.setView([loc?.value?.lat, loc?.value?.lon], 13);
@@ -42,23 +42,14 @@ import {doc, collection, setDoc, onSnapshot} from "firebase/firestore";
 
           // Set the map view to the user's location
           map.value.setView([latitude, longitude], 13);
-
-          // Add a marker at the user's location
-      //     if (marker !== null) {
-      //       map.value.removeLayer(marker);
-      //     }
-      //     marker = L.marker([latitude, longitude]).addTo(map.value);
-
-      //     marker.on('click', () => {
-      //    map.value.setView([latitude, longitude], 13);
-      // });
         },
         (error) => {
           console.error("Error getting current location:", error);
         }
       );
 
-      const collectionRef = collection(db, "testingSelect")
+  // reference to db collection
+  const collectionRef = collection(db, "search")
      
   const searchedAddress = async (address) => {
   try {
@@ -73,11 +64,7 @@ import {doc, collection, setDoc, onSnapshot} from "firebase/firestore";
       time: new Date().toLocaleString(),
     });
 
-    // marker = L.marker([address.lat, address.lon]).addTo(map.value);
-    //         marker.on('click', () => {
-    //         map.value.setView([address.lat, address.lon], 13)
-    //       })
-            map.value.setView([address.lat, address.lon], 13);
+    map.value.setView([address.lat, address.lon], 13);
 
   } catch (error) {
     console.error("Error saving address data:", error);
@@ -85,80 +72,29 @@ import {doc, collection, setDoc, onSnapshot} from "firebase/firestore";
 };
 
       const searchControl = L.control.addressSearch(
-        "47777fe9156749ca89df5e1b9ef27751",
+        import.meta.env.VITE_GEOAPIFY_API_KEY,
         
         {
           position: "topright",
           placeholder: "Enter address here",
           resultCallback: (address) => {
-           console.log(address);
             if (!address) {
               return;
             }
-            // if (marker !== null) {
-            //   map.value.removeLayer(marker);
-            // }
             searchedAddress(address)
-
-          //   marker = L.marker([address.lat, address.lon]).addTo(map.value);
-          //   marker.on('click', () => {
-          //   map.value.setView([address.lat, address.lon], 13)
-          // })
-          //   map.value.setView([address.lat, address.lon], 13);
-
           },
         }
       );
 
 
-      // keep track of markers to associated with address
-      const markers = {}
-   
-//       const searchControl = L.control.addressSearch(
-//   // process.env.VUE_APP_GEOAPIFY_API_KEY,
-//   "47777fe9156749ca89df5e1b9ef27751",
-//   {
-//     position: "topright",
-//     placeholder: "Enter address here",
-//     resultCallback: async (address) => {
-//       console.log(address);
-//       if (!address) {
-//         return;
-//       }
-      
-//       searchedAddress(address)
-//       const documentRef = doc(collectionRef, address.place_id);
-//       const documentSnapshot = await getDoc(documentRef);
-
-//       if (documentSnapshot.exists()) {
-//         // Address exists in the Firestore database
-//         if (markers[address.place_id]) {
-//           // Remove the previous marker if it exists
-//           map.value.removeLayer(markers[address.place_id]);
-//         }
-//         markers[address.place_id] = L.marker([address.lat, address.lon]).addTo(map.value);
-//         markers[address.place_id].on("click", () => {
-//           map.value.setView([address.lat, address.lon], 13);
-//         });
-//         map.value.setView([address.lat, address.lon], 13);
-//       } else {
-//         // Address does not exist in the Firestore database
-//         if (markers[address.place_id]) {
-//           // Remove the marker associated with the deleted document
-//           map.value.removeLayer(markers[address.place_id]);
-//           delete markers[address.place_id];
-//         }
-//         console.log("Address does not exist in the database.");
-//       }
-//     },
-//   }
-// );
+    // keep track of markers to associated with address
+   const markers = {}
 
   searchControl.addTo(map.value);
 
   const unsubscribe = onSnapshot(collectionRef, (snapshot) => {
+  
     // check for changes to the database and update marker accordingly
-    
   snapshot.docChanges().forEach((change) => {
     const docData = change.doc.data();
     const { lat, lon } = docData;
