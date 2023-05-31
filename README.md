@@ -14,11 +14,14 @@ For ease of demoing, app is deployed at: https://richard-chiu-accuenergy-task.ne
 - User's current location detection
 - Geolocation services
 
+Note: Clicking on marker or address in sidebar will take you to location on map
+
 ![App Screenshot](./public/app_screenshot.PNG)
 
 ### Getting Started
 
-clone repository and install all dependencies
+clone repository and install all dependencies.
+
 configure API keys and variables (.env.local)
 
 keys needed:
