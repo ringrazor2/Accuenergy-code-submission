@@ -62,7 +62,6 @@ const props = defineProps({
         
         const searchedAddress = async (address) => {
           try {
-            
             // Create a new document with a custom ID and save the address data
             await setDoc(doc(collectionRef, address.place_id), {
               id: address.place_id,

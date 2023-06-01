@@ -16,8 +16,6 @@ import {
 } from "firebase/firestore";
 import Head from "./Head.vue";
 import "leaflet-control-geocoder";
-import VPagination from "@hennge/vue3-pagination";
-import "@hennge/vue3-pagination/dist/vue3-pagination.css";
 
 const latitude = ref("");
 const longitude = ref("");
@@ -63,7 +61,7 @@ const locationClick = async () => {
 
 const deleteSelectedPlaces = async () => {
   // get all selected data you want to delete
-  const selectedDocuments = userSearch10.value.filter((data) => data.selected);
+  const selectedDocuments = allDocuments.filter((data) => data.selected);
 
   // for each selected data delete from database and update the userSearch10 array
   for (const document of selectedDocuments) {
@@ -71,6 +69,7 @@ const deleteSelectedPlaces = async () => {
       const documentRef = doc(db, "search", document.id);
       await updateDoc(documentRef, { selected: true });
       await deleteDoc(documentRef);
+      // location.reload();
     } catch (error) {
       console.error(`Error deleting document ${document.id}:`, error);
     }
@@ -237,13 +236,6 @@ onMounted(fetchFirstPage);
   </div>
 
   <div v-if="userSearch10?.length > 0" class = "flex items-center justify-center p-2">
-    <v-pagination
-    v-model="page"
-    :pages="pageCount"
-    :range-size="1"
-    active-color="#DCEDFF"
-  />
-
   </div>
 <div class = "flex justify-between w-full text-white">
 <button class = "text-2xl" @click = "fetchPreviousPage" v-if="userSearch10?.length > 0" >Previous</button>
@@ -253,16 +245,4 @@ onMounted(fetchFirstPage);
   </div>
 </template>
 
-<style>
-.Page{
-  width: 30px;
-  height: 30px;
-  cursor: auto;
-  border: none;
-}
-.Page:hover{
-  border: none;
-}
-
-</style>
 
