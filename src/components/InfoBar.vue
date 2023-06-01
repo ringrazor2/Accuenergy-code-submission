@@ -58,7 +58,14 @@ const locationClick = async () => {
     }
   });
 };
-
+const toggleSelected = async (data) => {
+  try {
+    const documentRef = doc(db, "search", data.id);
+    await updateDoc(documentRef, { selected: !data.selected });
+  } catch (error) {
+    console.error(`Error toggling selection for document ${data.id}:`, error);
+  }
+};
 const deleteSelectedPlaces = async () => {
   // get all selected data you want to delete
   const selectedDocuments = allDocuments.filter((data) => data.selected);
@@ -67,7 +74,6 @@ const deleteSelectedPlaces = async () => {
   for (const document of selectedDocuments) {
     try {
       const documentRef = doc(db, "search", document.id);
-      await updateDoc(documentRef, { selected: true });
       await deleteDoc(documentRef);
       // location.reload();
     } catch (error) {
@@ -193,7 +199,7 @@ onMounted(fetchFirstPage);
   <div class="flex flex-col bg-dark h-screen w-[35%] px-5 items-center">
     <Head />
     <button class="btn" @click="locationClick">
-      <p class = "text-2xl">Your Location</p>
+      <p class="text-2xl">Your Location</p>
     </button>
     <div>
       <p class="text-white pt-8 text-center text-xl" v-if="placeName">
@@ -206,43 +212,34 @@ onMounted(fetchFirstPage);
         Delete
       </button>
       <div class="max-h-[700px] overflow-y-auto">
-  <table class="bg-white w-full rounded-lg text-lg" v-if="userSearch10?.length > 0">
-    <thead>
-      <tr class="p-4 pt-4">
-        <th class="px-4 pt-4">Select</th>
-        <th class = "pt-4">Time searched</th>
-        <th class = "pt-4">Address</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-              v-for="(data, index) in userSearch10"
-              :key="data.id"
-              :class="{ 'bg-gray-300': selectedRow === index }"
-              class="hover:bg-slate-300"
-            >
-              <td class="my-3"><input type="checkbox" class="cursor-pointer h-4" v-model="data.selected" /></td>
-              <td class="py-3">{{ data.time }}</td>
-              <td
-                class="py-3 overflow-hidden pl-6 cursor-pointer"
-                @click="goToAddress(data.lat, data.lon); selectedRow = index"
-              >{{ data.address }}</td>
+        <table class="bg-white w-full rounded-lg text-lg" v-if="userSearch10?.length > 0">
+          <thead>
+            <tr class="p-4 pt-4">
+              <th class="px-4 pt-4">Select</th>
+              <th class="pt-4">Time searched</th>
+              <th class="pt-4">Address</th>
             </tr>
-    </tbody>
-  </table>
-  </div>
-</div>
-<div v-if="userSearch10?.length > 0" class = "flex items-center justify-center p-2">
-  </div>
-
-  <div v-if="userSearch10?.length > 0" class = "flex items-center justify-center p-2">
-  </div>
-<div class = "flex justify-between w-full text-white">
-<button class = "text-2xl" @click = "fetchPreviousPage" v-if="userSearch10?.length > 0" >Previous</button>
-<button class = "text-2xl" @click = "fetchNextPage" v-if="userSearch10?.length" >Next</button>
-</div>
-  
+          </thead>
+          <tbody>
+            <tr v-for="(data, index) in userSearch10" :key="data.id" :class="{ 'bg-gray-300': selectedRow === index }" class="hover:bg-slate-300">
+              <td class="my-3">
+                <input type="checkbox" class="cursor-pointer h-4" :checked="data.selected" @change="toggleSelected(data)" />
+              </td>
+              <td class="py-3">{{ data.time }}</td>
+              <td class="py-3 overflow-hidden pl-6 cursor-pointer" @click="goToAddress(data.lat, data.lon); selectedRow = index">{{ data.address }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div v-if="userSearch10?.length > 0" class="flex items-center justify-center p-2"></div>
+    <div v-if="userSearch10?.length > 0" class="flex items-center justify-center p-2"></div>
+    <div class="flex justify-between w-full text-white">
+      <button class="text-2xl" @click="fetchPreviousPage" v-if="userSearch10?.length > 0">Previous</button>
+      <button class="text-2xl" @click="fetchNextPage" v-if="userSearch10?.length">Next</button>
+    </div>
   </div>
 </template>
+
 
 
