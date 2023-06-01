@@ -221,7 +221,7 @@ onMounted(fetchFirstPage);
       <button class="bg-red-600 hover:bg-red-700 text-white w-1/4 rounded-md items-end mb-0.5 text-xl" v-if="userSearch10?.length > 0" @click="deleteSelectedPlaces">
         Delete
       </button>
-      <div class="max-h-[600px] overflow-y-auto">
+      <div class="max-h-[70%] overflow-y-auto">
         <table class="bg-white w-full rounded-lg text-lg" v-if="userSearch10?.length > 0">
           <thead>
             <tr class="p-4 pt-4">
@@ -241,13 +241,12 @@ onMounted(fetchFirstPage);
           </tbody>
         </table>
       </div>
+      <div class="flex justify-between w-full text-white">
+        <button class="text-2xl" @click="fetchPreviousPage" v-if="userSearch10?.length > 0">Previous</button>
+        <button class="text-2xl" @click="fetchNextPage" v-if="userSearch10?.length">Next</button>
+      </div>
     </div>
-    <div v-if="userSearch10?.length > 0" class="flex items-center justify-center p-2"></div>
-    <div v-if="userSearch10?.length > 0" class="flex items-center justify-center p-2"></div>
-    <div class="flex justify-between w-full text-white">
-      <button class="text-2xl" @click="fetchPreviousPage" v-if="userSearch10?.length > 0">Previous</button>
-      <button class="text-2xl" @click="fetchNextPage" v-if="userSearch10?.length">Next</button>
-    </div>
+   
   </div>
 </template>
 
