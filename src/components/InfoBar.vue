@@ -216,12 +216,12 @@ onMounted(fetchFirstPage);
         You are here: {{ placeName }} [lat: {{ latitude.toFixed(2) }}, lng: {{ longitude.toFixed(2) }}]
       </p>
     </div>
-    <div class="flex flex-col mt-4 overflow-y-auto">
+    <div class="flex flex-col mt-4 overflow-y-auto pb-3">
       <h2 class="text-primary text-3xl capitalize text-center mb-3">History</h2>
       <button class="bg-red-600 hover:bg-red-700 text-white w-1/4 rounded-md items-end mb-0.5 text-lg" v-if="userSearch10?.length > 0" @click="deleteSelectedPlaces">
         Delete
       </button>
-      <div class="max-h-[70%] overflow-y-auto">
+      <div class="overflow-y-auto">
         <table class="bg-white w-full rounded-lg text-sm " v-if="userSearch10?.length > 0">
           <thead>
             <tr class="p-4 pt-4">
