@@ -222,7 +222,7 @@ onMounted(fetchFirstPage);
         Delete
       </button>
       <div class="max-h-[70%] overflow-y-auto">
-        <table class="bg-white w-full rounded-lg text-lg" v-if="userSearch10?.length > 0">
+        <table class="bg-white w-full rounded-lg text-lg max-h[75%]" v-if="userSearch10?.length > 0">
           <thead>
             <tr class="p-4 pt-4">
               <th class="px-4 pt-4">Select</th>
