@@ -209,20 +209,20 @@ onMounted(fetchFirstPage);
   <div class="flex flex-col bg-dark h-screen w-[35%] px-5 items-center">
     <Head />
     <button class="btn" @click="locationClick">
-      <p class="text-2xl">Your Location</p>
+      <p class="text-xl">Your Location</p>
     </button>
     <div>
-      <p class="text-white pt-8 text-center text-xl" v-if="placeName">
+      <p class="text-white pt-6 text-center text-xl" v-if="placeName">
         You are here: {{ placeName }} [lat: {{ latitude.toFixed(2) }}, lng: {{ longitude.toFixed(2) }}]
       </p>
     </div>
-    <div class="flex flex-col mt-10">
-      <h2 class="text-primary text-4xl capitalize text-center pb-4">History</h2>
-      <button class="bg-red-600 hover:bg-red-700 text-white w-1/4 rounded-md items-end mb-0.5 text-xl" v-if="userSearch10?.length > 0" @click="deleteSelectedPlaces">
+    <div class="flex flex-col mt-4 overflow-y-auto">
+      <h2 class="text-primary text-3xl capitalize text-center mb-3">History</h2>
+      <button class="bg-red-600 hover:bg-red-700 text-white w-1/4 rounded-md items-end mb-0.5 text-lg" v-if="userSearch10?.length > 0" @click="deleteSelectedPlaces">
         Delete
       </button>
       <div class="max-h-[70%] overflow-y-auto">
-        <table class="bg-white w-full rounded-lg text-lg max-h[75%]" v-if="userSearch10?.length > 0">
+        <table class="bg-white w-full rounded-lg text-sm " v-if="userSearch10?.length > 0">
           <thead>
             <tr class="p-4 pt-4">
               <th class="px-4 pt-4">Select</th>
@@ -232,18 +232,18 @@ onMounted(fetchFirstPage);
           </thead>
           <tbody>
             <tr v-for="(data, index) in userSearch10" :key="data.id" :class="{ 'bg-gray-300': selectedRow === index }" class="hover:bg-slate-300">
-              <td class="my-3">
+              <td class="my-2">
                 <input type="checkbox" class="cursor-pointer h-4" :checked="data.selected" @change="toggleSelected(data)" />
               </td>
-              <td class="py-3">{{ data.time }}</td>
-              <td class="py-3 overflow-hidden pl-6 cursor-pointer" @click="goToAddress(data.lat, data.lon); selectedRow = index">{{ data.address }}</td>
+              <td class="py-2">{{ data.time }}</td>
+              <td class="py-2 overflow-hidden pl-6 cursor-pointer" @click="goToAddress(data.lat, data.lon); selectedRow = index">{{ data.address }}</td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="flex justify-between w-full text-white">
-        <button class="text-2xl" @click="fetchPreviousPage" v-if="userSearch10?.length > 0">Previous</button>
-        <button class="text-2xl" @click="fetchNextPage" v-if="userSearch10?.length">Next</button>
+        <button class="text-xl" @click="fetchPreviousPage" v-if="userSearch10?.length > 0">Previous</button>
+        <button class="text-xl" @click="fetchNextPage" v-if="userSearch10?.length">Next</button>
       </div>
     </div>
    
