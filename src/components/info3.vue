@@ -102,7 +102,7 @@ pageCount.value = 1;
   );
 
   // get real time data from database
-   onSnapshot(q, (snapshot) => {
+  const unsubscribe = onSnapshot(q, (snapshot) => {
     const data = snapshot.docs.map((doc) => doc.data());
     
     //save batches of 10 data to state
@@ -121,7 +121,7 @@ pageCount.value = 1;
     
   });
   // return if we don't need real time data anymore
- 
+  return unsubscribe
 };
 
 
@@ -143,23 +143,20 @@ const fetchNextPage = async () => {
     const firstDocument = snapshot.docs[0];
     
     allDocuments.push(...data);
-    // const uniqueDoc = [...new Set(allDocuments)];
-    
-    
-    const uniqueDoc = Array.from(
-    new Set(allDocuments.map((doc) => doc.id))
-    ).map((id) => allDocuments.find((doc) => doc.id === id));
+    const uniqueDoc = [...new Set(allDocuments)];
    
     // get max page count for conditional 
     maxPageCount = Math.ceil(uniqueDoc.length / pageSize);
-    
     if (pageCount.value >= maxPageCount) {
       return;
     }
     
     userSearch10.value = data;
     previousEntryNext.value = lastDocument ? lastDocument.data() : null;
+
     previousEntryPrev.value = firstDocument ? firstDocument.data() : null;
+    
+    
     page.value++;
     pageCount.value++;
     
@@ -221,7 +218,7 @@ onMounted(fetchFirstPage);
       <button class="bg-red-600 hover:bg-red-700 text-white w-1/4 rounded-md items-end mb-0.5 text-xl" v-if="userSearch10?.length > 0" @click="deleteSelectedPlaces">
         Delete
       </button>
-      <div class="max-h-[600px] overflow-y-auto">
+      <div class="max-h-[700px] overflow-y-auto">
         <table class="bg-white w-full rounded-lg text-lg" v-if="userSearch10?.length > 0">
           <thead>
             <tr class="p-4 pt-4">
